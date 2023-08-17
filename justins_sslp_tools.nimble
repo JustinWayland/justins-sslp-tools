@@ -5,7 +5,7 @@ author        = "JustinWayland"
 description   = "A collection of tools for easing the creation of SSLPs"
 license       = "GPL-2.0-or-later"
 srcDir        = "src"
-bin           = @["justins_sslp_tools"]
+bin           = @["nimsend"]
 
 
 # Dependencies
