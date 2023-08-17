@@ -2,7 +2,7 @@
 
 version       = "0.1.0"
 author        = "JustinWayland"
-description   = "A variety of tools useful for making a SSLP"
+description   = "A collection of tools for easing the creation of SSLPs"
 license       = "GPL-2.0-or-later"
 srcDir        = "src"
 bin           = @["justins_sslp_tools"]
