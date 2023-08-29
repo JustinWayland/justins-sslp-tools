@@ -3,13 +3,14 @@ import std/paths
 import std/appdirs
 import std/streams
 import std/strutils
+import std/os
 import cligen
 
 type 
     MissingOptionException = object of ValueError
 
 proc nimsend(args: seq[string]): int =
-    let configPath: Path = getConfigDir() / Path("nimsend") / Path("nimsend.ini")
+    let configPath: Path = appdirs.getConfigDir() / Path("nimsend") / Path("nimsend.ini")
     var configStream = newFileStream(configPath.string, fmRead)
     assert configStream != nil, "can't read required configuration file " & configPath.string
     var username: string
@@ -27,6 +28,10 @@ proc nimsend(args: seq[string]): int =
         echo "username: " & username
         echo "password: " & password
         echo "mb_limit: " & $mb_limit
+        echo "files to upload: "
+        for pattern in args:
+            for file in walkPattern(pattern):
+                echo file
     finally:
         configStream.close()
 
