@@ -4,6 +4,7 @@ import std/appdirs
 import std/streams
 import std/strutils
 import std/os
+import std/[mimetypes, httpclient]
 import cligen
 
 type 
@@ -30,9 +31,15 @@ proc nimsend(args: seq[string]): int =
         echo "mb_limit: " & $mb_limit
     finally:
         configStream.close()
-    echo "files to upload: "
-    for pattern in args:
-        for file in walkPattern(pattern):
-            echo file
-
+    var httpClient = newHttpClient()
+    var mimes = newMimetypes()
+    try:
+        for pattern in args:
+            for file in walkPattern(pattern):
+                var data = newMultipartData()
+                data.add({"username": username, "password": password, "output": "json"})
+                data.addFiles({"file": file}, mimedb = mimes)
+                echo httpClient.postContent("https://lpix.org/api", multipart=data)
+    finally:
+        httpClient.close()
 dispatch nimsend
