@@ -28,11 +28,11 @@ proc nimsend(args: seq[string]): int =
         echo "username: " & username
         echo "password: " & password
         echo "mb_limit: " & $mb_limit
-        echo "files to upload: "
-        for pattern in args:
-            for file in walkPattern(pattern):
-                echo file
     finally:
         configStream.close()
+    echo "files to upload: "
+    for pattern in args:
+        for file in walkPattern(pattern):
+            echo file
 
 dispatch nimsend
