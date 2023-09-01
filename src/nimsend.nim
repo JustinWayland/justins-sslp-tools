@@ -35,7 +35,7 @@ proc nimsend(args: seq[string]): int =
     var mimes = newMimetypes()
     try:
         for pattern in args:
-            for file in walkPattern(pattern):
+            for file in walkFiles(pattern):
                 var data = newMultipartData()
                 data.add({"username": username, "password": password, "output": "json"})
                 data.addFiles({"file": file}, mimedb = mimes)
