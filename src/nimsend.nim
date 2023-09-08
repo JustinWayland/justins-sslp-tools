@@ -43,6 +43,9 @@ proc nimsend(output: string = "output.json", args: seq[string]): int =
                 data.addFiles({"file": file}, mimedb = mimes)
                 var contentData = newStringTable(modeCaseSensitive)
                 contentData.fromJson(parseJson(httpClient.postContent("https://lpix.org/api", multipart=data)))
+                if outputTable.contains(contentData["filename"]):
+                    echo "outputTable already contains data for " & contentData["filename"] & ", outputting old value"
+                    echo contentData[contentData["filename"]]
                 outputTable[contentData["filename"]] = contentData["imageUrl"] # TODO: Add error validation
     finally:
         httpClient.close()
