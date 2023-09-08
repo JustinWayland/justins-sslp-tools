@@ -41,12 +41,12 @@ proc nimsend(output: string = "output.json", args: seq[string]): int =
                 var data = newMultipartData()
                 data.add({"username": username, "password": password, "output": "json"})
                 data.addFiles({"file": file}, mimedb = mimes)
-                var contentData = newStringTable(modeCaseSensitive)
-                contentData.fromJson(parseJson(httpClient.postContent("https://lpix.org/api", multipart=data)))
-                if outputTable.contains(contentData["filename"]):
-                    echo "outputTable already contains data for " & contentData["filename"] & ", outputting old value"
-                    echo contentData[contentData["filename"]]
-                outputTable[contentData["filename"]] = contentData["imageUrl"] # TODO: Add error validation
+                var jsonNode = parseJson(httpClient.postContent("https://lpix.org/api", multipart=data))
+                let filename = jsonNode["filename"].getStr()
+                if outputTable.contains(filename):
+                    echo "outputTable already contains data for " & filename & ", outputting old value"
+                    echo outputTable[filename]
+                outputTable[filename] = jsonNode["imageUrl"].getStr() # TODO: Add error validation
     finally:
         httpClient.close()
     var outputStream = newFileStream(output, fmWrite)
