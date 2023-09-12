@@ -35,34 +35,30 @@ proc nimsend(output: string = "output.json", args: seq[string]): int =
     var httpClient = newHttpClient()
     var mimes = newMimetypes()
     var outputTable = newStringTable(modeCaseSensitive)
-    try:
-        for pattern in args:
-            for file in walkFiles(pattern):
-                var data = newMultipartData()
-                data.add({"username": username, "password": password, "output": "json"})
-                data.addFiles({"file": file}, mimedb = mimes)
-                var response = httpClient.postContent("https://lpix.org/api", multipart=data)
-                var jsonNode = parseJson(response)
-                if jsonNode.kind != JObject:
-                    echo "unexpected response for " & file & ": " & response
-                elif jsonNode["err"].kind == JNull:
-                    let filename = jsonNode["filename"].getStr()
-                    if outputTable.contains(filename):
-                        echo "outputTable already contains data for " & filename & ", outputting old value"
-                        echo outputTable[filename]
-                    outputTable[filename] = jsonNode["imageUrl"].getStr() # TODO: Add error validation
-                else:
-                    echo "upload of " & file & " failed with error code " & jsonNode["error"].getStr("??????")
-    finally:
-        httpClient.close()
+    defer: httpClient.close()
+    for pattern in args:
+        for file in walkFiles(pattern):
+            var data = newMultipartData()
+            data.add({"username": username, "password": password, "output": "json"})
+            data.addFiles({"file": file}, mimedb = mimes)
+            var response = httpClient.postContent("https://lpix.org/api", multipart=data)
+            var jsonNode = parseJson(response)
+            if jsonNode.kind != JObject:
+                echo "unexpected response for " & file & ": " & response
+            elif jsonNode["err"].kind == JNull:
+                let filename = jsonNode["filename"].getStr()
+                if outputTable.contains(filename):
+                    echo "outputTable already contains data for " & filename & ", outputting old value"
+                    echo outputTable[filename]
+                outputTable[filename] = jsonNode["imageUrl"].getStr() # TODO: Add error validation
+            else:
+                echo "upload of " & file & " failed with error code " & jsonNode["error"].getStr("??????")
     var outputStream = newFileStream(output, fmWrite)
     if outputStream == nil:
         echo "Unable to open output file " & output
         echo "Outputting string table to stdout: "
         echo $(outputTable.toJson)
-    try:
-        outputStream.write($(outputTable.toJson))
-    finally:
-        outputStream.close()
+    defer: outputStream.close()
+    outputStream.write($(outputTable.toJson))
 
 dispatch nimsend
