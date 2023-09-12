@@ -10,6 +10,8 @@ import cligen
 
 type 
     MissingOptionException = object of ValueError
+    AuthenticationException = object of ValueError
+    LPixDownException = object of IOError
 
 proc nimsend(output: string = "output.json", args: seq[string]): int =
     let configPath: Path = appdirs.getConfigDir() / Path("nimsend") / Path("nimsend.ini")
@@ -52,7 +54,20 @@ proc nimsend(output: string = "output.json", args: seq[string]): int =
                     echo outputTable[filename]
                 outputTable[filename] = jsonNode["imageUrl"].getStr() # TODO: Add error validation
             else:
-                echo "upload of " & file & " failed with error code " & jsonNode["err"].getStr("??????")
+                case jsonNode["err"].getStr():
+                    of "err1":
+                        echo "unable to upload " & file & " due to a bad request"
+                    of "err2":
+                        echo "username " & username & " and password " & password & " are not valid credentials"
+                        raise newException(AuthenticationException, "bad username and password")
+                    of "err3":
+                        echo file & " is not a kind of file that can be uploaded to LPix"
+                    of "err4":
+                        echo file & " is too large."
+                    of "err6":
+                        raise newException(LPixDownException, "LPix is down, try again later.")
+                    else:
+                        echo "upload of " & file & " failed with error code " & jsonNode["err"].getStr("??????")
     var outputStream = newFileStream(output, fmWrite)
     if outputStream == nil:
         echo "Unable to open output file " & output
