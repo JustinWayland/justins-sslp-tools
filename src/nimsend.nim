@@ -59,6 +59,7 @@ proc nimsend(output: string = "output.json", args: seq[string]): int =
         echo "Outputting string table to stdout: "
         echo $(outputTable.toJson)
     defer: outputStream.close()
-    outputStream.write($(outputTable.toJson))
+    if outputStream != nil:
+        outputStream.write($(outputTable.toJson))
 
 dispatch nimsend
