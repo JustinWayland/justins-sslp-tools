@@ -52,7 +52,7 @@ proc nimsend(output: string = "output.json", args: seq[string]): int =
                     echo outputTable[filename]
                 outputTable[filename] = jsonNode["imageUrl"].getStr() # TODO: Add error validation
             else:
-                echo "upload of " & file & " failed with error code " & jsonNode["error"].getStr("??????")
+                echo "upload of " & file & " failed with error code " & jsonNode["err"].getStr("??????")
     var outputStream = newFileStream(output, fmWrite)
     if outputStream == nil:
         echo "Unable to open output file " & output
