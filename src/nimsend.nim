@@ -13,7 +13,7 @@ type
     AuthenticationException = object of ValueError
     LPixDownException = object of IOError
 
-proc nimsend(output: string = "output.json", args: seq[string]): int =
+proc nimsend(output: string = "output.json", gallery = "", args: seq[string]): int =
     let configPath: Path = appdirs.getConfigDir() / Path("nimsend") / Path("nimsend.ini")
     var configStream = newFileStream(configPath.string, fmRead)
     assert configStream != nil, "can't read required configuration file " & configPath.string
@@ -42,6 +42,8 @@ proc nimsend(output: string = "output.json", args: seq[string]): int =
         for file in walkFiles(pattern):
             var data = newMultipartData()
             data.add({"username": username, "password": password, "output": "json"})
+            if gallery != "":
+                data.add({"gallery": gallery})
             data.addFiles({"file": file}, mimedb = mimes)
             var response = httpClient.postContent("https://lpix.org/api", multipart=data)
             var jsonNode = parseJson(response)
@@ -77,4 +79,4 @@ proc nimsend(output: string = "output.json", args: seq[string]): int =
     if outputStream != nil:
         outputStream.write($(outputTable.toJson))
 
-dispatch nimsend, short={"output": 'o'}
+dispatch nimsend, short={"output": 'o', "gallery": 'g'}
