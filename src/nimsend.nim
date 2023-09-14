@@ -77,4 +77,4 @@ proc nimsend(output: string = "output.json", args: seq[string]): int =
     if outputStream != nil:
         outputStream.write($(outputTable.toJson))
 
-dispatch nimsend
+dispatch nimsend, short={"output": 'o'}
