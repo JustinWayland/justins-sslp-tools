@@ -54,7 +54,7 @@ proc nimsend(output: string = "output.json", gallery = "", args: seq[string]): i
                 if outputTable.contains(filename):
                     echo "outputTable already contains data for " & filename & ", outputting old value"
                     echo outputTable[filename]
-                outputTable[filename] = jsonNode["imageUrl"].getStr() # TODO: Add error validation
+                outputTable[filename] = jsonNode["imageurl"].getStr()
             else:
                 case jsonNode["err"].getStr():
                     of "err1":
