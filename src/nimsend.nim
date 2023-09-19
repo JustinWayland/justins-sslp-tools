@@ -55,6 +55,7 @@ proc nimsend(output: string = "output.json", gallery = "", args: seq[string]): i
                     echo "outputTable already contains data for " & filename & ", outputting old value"
                     echo outputTable[filename]
                 outputTable[filename] = jsonNode["imageurl"].getStr()
+                echo "successfully uploaded " & filename
             else:
                 case jsonNode["err"].getStr():
                     of "err1":
@@ -76,6 +77,7 @@ proc nimsend(output: string = "output.json", gallery = "", args: seq[string]): i
         echo "Outputting string table to stdout: "
         echo $(outputTable.toJson)
     defer: outputStream.close()
+    echo "serializing output table"
     if outputStream != nil:
         outputStream.write($(outputTable.toJson))
 
