@@ -14,6 +14,7 @@ type
     LPixDownException = object of IOError
 
 proc nimsend(output: string = "output.json", gallery = "", args: seq[string]): int =
+    ## Uploads pictures to LPix
     let configPath: Path = appdirs.getConfigDir() / Path("nimsend") / Path("nimsend.ini")
     var configStream = newFileStream(configPath.string, fmRead)
     assert configStream != nil, "can't read required configuration file " & configPath.string
