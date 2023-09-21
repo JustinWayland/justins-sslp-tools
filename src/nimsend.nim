@@ -13,7 +13,7 @@ type
     AuthenticationException = object of ValueError
     LPixDownException = object of IOError
 
-proc nimsend(output: string = "output.json", gallery = "", args: seq[string]): int =
+proc nimsend(output: string = "output.json", gallery = "", images: seq[string]): int =
     ## Uploads pictures to LPix
     let configPath: Path = appdirs.getConfigDir() / Path("nimsend") / Path("nimsend.ini")
     var configStream = newFileStream(configPath.string, fmRead)
@@ -39,7 +39,7 @@ proc nimsend(output: string = "output.json", gallery = "", args: seq[string]): i
     var mimes = newMimetypes()
     var outputTable = newStringTable(modeCaseSensitive)
     defer: httpClient.close()
-    for pattern in args:
+    for pattern in images:
         for file in walkFiles(pattern):
             var data = newMultipartData()
             data.add({"username": username, "password": password, "output": "json"})
