@@ -81,7 +81,7 @@ proc nimsend(output: string = "output.json", gallery = "", images: seq[string]):
     defer: outputStream.close()
     echo "serializing output table"
     if outputStream != nil:
-        outputStream.write($(outputTable.toJson))
+        outputStream.write(outputTable.toJson.pretty)
 
 const
     Help = {
