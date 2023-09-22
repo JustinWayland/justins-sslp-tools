@@ -77,7 +77,7 @@ proc nimsend(output: string = "output.json", gallery = "", images: seq[string]):
     if outputStream == nil:
         echo "Unable to open output file " & output
         echo "Outputting string table to stdout: "
-        echo $(outputTable.toJson)
+        echo outputTable.toJson.pretty
     defer: outputStream.close()
     echo "serializing output table"
     if outputStream != nil:
