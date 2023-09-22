@@ -7,6 +7,7 @@ import std/os
 import std/[mimetypes, httpclient]
 import std/[strtabs,json,jsonutils]
 import cligen
+from std/tables import toTable
 
 type 
     MissingOptionException = object of ValueError
@@ -82,4 +83,11 @@ proc nimsend(output: string = "output.json", gallery = "", images: seq[string]):
     if outputStream != nil:
         outputStream.write($(outputTable.toJson))
 
-dispatch nimsend, short={"output": 'o', "gallery": 'g'}
+const
+    Help = {
+        "output": "The file to output a dictionary mapping filenames to URLs. Will be overwritten.",
+        "gallery": "The gallery to put the image in. Optional."
+    }.toTable()
+    Short = {"gallery": 'g', "output": 'o'}.toTable()
+
+dispatch(nimsend, help = Help, short = Short)
