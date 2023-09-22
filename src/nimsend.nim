@@ -1,9 +1,6 @@
 import std/parsecfg
-import std/paths
-import std/appdirs
-import std/streams
 import std/strutils
-import std/os
+import std/[os,paths,appdirs,streams]
 import std/[mimetypes, httpclient]
 import std/[strtabs,json,jsonutils]
 import cligen
