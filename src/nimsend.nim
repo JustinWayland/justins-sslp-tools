@@ -71,14 +71,15 @@ proc nimsend(output: string = "output.json", gallery = "", images: seq[string]):
                     else:
                         echo "upload of " & file & " failed with error code " & jsonNode["err"].getStr("??????")
     var outputStream = newFileStream(output, fmWrite)
+    var output = outputTable.toJson.pretty
     if outputStream == nil:
         echo "Unable to open output file " & output
         echo "Outputting string table to stdout: "
-        echo outputTable.toJson.pretty
+        echo output
     defer: outputStream.close()
     echo "serializing output table"
     if outputStream != nil:
-        outputStream.write(outputTable.toJson.pretty)
+        outputStream.write(output)
 
 const
     Help = {
