@@ -34,9 +34,9 @@ proc nimsend(output: string = "output.json", gallery = "", images: seq[string]):
     finally:
         configStream.close()
     var httpClient = newHttpClient()
+    defer: httpClient.close()
     var mimes = newMimetypes()
     var outputTable = newStringTable(modeCaseSensitive)
-    defer: httpClient.close()
     for pattern in images:
         for file in walkFiles(pattern):
             var data = newMultipartData()
