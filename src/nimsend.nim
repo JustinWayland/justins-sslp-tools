@@ -11,7 +11,7 @@ type
     AuthenticationException = object of ValueError
     LPixDownException = object of IOError
 
-proc nimsend(output: string = "output.json", gallery = "", images: seq[string]): int =
+proc nimsend(output: string = "output.json", mergeWith: string = "", gallery = "", images: seq[string]): int =
     ## Uploads pictures to LPix
     let configPath: Path = appdirs.getConfigDir() / Path("nimsend") / Path("nimsend.ini")
     var configStream = newFileStream(configPath.string, fmRead)
@@ -36,7 +36,17 @@ proc nimsend(output: string = "output.json", gallery = "", images: seq[string]):
     var httpClient = newHttpClient()
     defer: httpClient.close()
     var mimes = newMimetypes()
-    var outputTable = newStringTable(modeCaseSensitive)
+    var outputTable: StringTableRef = newStringTable(modeCaseSensitive)
+    if mergeWith != "":
+        var mergeStream = newFileStream(mergeWith, fmRead)
+        if mergeStream != nil:
+            var objectToMerge = parseJson(mergeStream.Stream, extractFilename(mergeWith))
+            if objectToMerge.contains("mode") and objectToMerge["mode"].kind == JString:
+                outputTable.fromJson(objectToMerge)
+            else:
+                for key, value in objectToMerge.pairs():
+                    if value.kind == JString:
+                        outputTable[key] = value.getStr()
     for pattern in images:
         for file in walkFiles(pattern):
             var data = newMultipartData()
@@ -84,8 +94,9 @@ proc nimsend(output: string = "output.json", gallery = "", images: seq[string]):
 const
     Help = {
         "output": "The file to output a dictionary mapping filenames to URLs. Will be overwritten.",
-        "gallery": "The gallery to put the image in. Optional."
+        "gallery": "The gallery to put the image in. Optional.",
+        "mergeWith": "A JSON file to merge with the output of our uploads. Values should only be strings. Optional."
     }.toTable()
-    Short = {"gallery": 'g', "output": 'o'}.toTable()
+    Short = {"gallery": 'g', "output": 'o', "mergeWith": 'm'}.toTable()
 
 dispatch(nimsend, help = Help, short = Short)
