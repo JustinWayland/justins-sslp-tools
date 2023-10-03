@@ -86,10 +86,12 @@ proc nimsend(output: string = "output.json", mergeWith: string = "", gallery = "
         echo "Unable to open output file " & output
         echo "Outputting string table to stdout: "
         echo output
+        return -1
     defer: outputStream.close()
     echo "serializing output table"
     if outputStream != nil:
         outputStream.write(output)
+    return 0
 
 const
     Help = {
