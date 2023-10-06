@@ -1,26 +1,29 @@
 import std/parsecfg
 import std/strutils
-import std/[os,paths,appdirs,streams]
+import std/[os, paths, appdirs, streams]
 import std/[mimetypes, httpclient]
-import std/[strtabs,json,jsonutils]
+import std/[strtabs, json, jsonutils]
 import cligen
 from std/tables import toTable
 
-type 
+type
     MissingOptionException = object of ValueError
     AuthenticationException = object of ValueError
     LPixDownException = object of IOError
 
-proc nimsend(output: string = "output.json", mergeWith: string = "", gallery = "", images: seq[string]): int =
+proc nimsend(output: string = "output.json", mergeWith: string = "",
+        gallery = "", images: seq[string]): int =
     ## Uploads pictures to LPix
     let configPath: Path = appdirs.getConfigDir() / Path("nimsend") / Path("nimsend.ini")
     var configStream = newFileStream(configPath.string, fmRead)
-    assert configStream != nil, "can't read required configuration file " & configPath.string
+    assert configStream != nil, "can't read required configuration file " &
+            configPath.string
     var username: string
     var password: string
     var mb_limit: int
-    try: 
-        var settings: Config = loadConfig(configStream.Stream, configPath.string)
+    try:
+        var settings: Config = loadConfig(configStream.Stream,
+                configPath.string)
         username = settings.getSectionValue("", "username", "")
         if username == "":
             raise newException(MissingOptionException, "username must be specified in the default section of the file")
@@ -50,11 +53,13 @@ proc nimsend(output: string = "output.json", mergeWith: string = "", gallery = "
     for pattern in images:
         for file in walkFiles(pattern):
             var data = newMultipartData()
-            data.add({"username": username, "password": password, "output": "json"})
+            data.add({"username": username, "password": password,
+                    "output": "json"})
             if gallery != "":
                 data.add({"gallery": gallery})
             data.addFiles({"file": file}, mimedb = mimes)
-            var response = httpClient.postContent("https://lpix.org/api", multipart=data)
+            var response = httpClient.postContent("https://lpix.org/api",
+                    multipart = data)
             var jsonNode = parseJson(response)
             if jsonNode.kind != JObject:
                 echo "unexpected response for " & file & ": " & response
@@ -70,7 +75,8 @@ proc nimsend(output: string = "output.json", mergeWith: string = "", gallery = "
                     of "err1":
                         echo "unable to upload " & file & " due to a bad request"
                     of "err2":
-                        echo "username " & username & " and password " & password & " are not valid credentials"
+                        echo "username " & username & " and password " &
+                                password & " are not valid credentials"
                         raise newException(AuthenticationException, "bad username and password")
                     of "err3":
                         echo file & " is not a kind of file that can be uploaded to LPix"
@@ -79,7 +85,8 @@ proc nimsend(output: string = "output.json", mergeWith: string = "", gallery = "
                     of "err6":
                         raise newException(LPixDownException, "LPix is down, try again later.")
                     else:
-                        echo "upload of " & file & " failed with error code " & jsonNode["err"].getStr("??????")
+                        echo "upload of " & file & " failed with error code " &
+                                jsonNode["err"].getStr("??????")
     var outputStream = newFileStream(output, fmWrite)
     var output = outputTable.toJson.pretty
     if outputStream == nil:
