@@ -13,6 +13,9 @@ proc open(L: var UpdateParser, input: Stream) =
     L.curtext = ""
     L.state = statePlainText
 
+proc close(L: var UpdateParser) =
+    lexbase.close(L)
+
 proc getNextFragment(parser: var UpdateParser): string = discard
 
 proc expandupdate(text_tables: seq[string], output: string, file: string): int = discard
