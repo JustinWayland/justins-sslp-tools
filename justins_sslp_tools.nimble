@@ -12,3 +12,4 @@ bin           = @["nimsend", "expandupdate"]
 
 requires "nim >= 2.0.0"
 requires "cligen >= 1.6.15"
+requires "faststreams"
